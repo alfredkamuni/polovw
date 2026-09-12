@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create Passwords</title>
+<style>
+  body { font-family: -apple-system, sans-serif; background: #0b1220; color: #f1f5f9; padding: 24px; max-width: 440px; margin: 0 auto; }
+  h1 { font-size: 22px; margin-bottom: 8px; }
+  p { font-size: 13px; color: #94a3b8; margin-bottom: 20px; line-height: 1.5; }
+  label { display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.2px; color: #64748b; margin: 16px 0 6px; }
+  input { width: 100%; padding: 14px; font-size: 16px; background: #0f172a; border: 1.5px solid rgba(255,255,255,.11); border-radius: 10px; color: #fff; box-sizing: border-box; }
+  input:focus { outline: none; border-color: #10b981; }
+  button { width: 100%; padding: 16px; margin-top: 24px; background: linear-gradient(135deg, #10b981, #059669); color: #fff; border: none; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; }
+  button:disabled { opacity: .6; }
+  #out { margin-top: 20px; padding: 16px; border-radius: 10px; font-size: 14px; white-space: pre-wrap; word-break: break-word; display: none; }
+  .ok { display: block; background: rgba(16,185,129,.15); border: 1px solid rgba(16,185,129,.3); color: #a7f3d0; }
+  .err { display: block; background: rgba(244,63,94,.15); border: 1px solid rgba(244,63,94,.3); color: #fecdd3; }
+</style>
+</head>
+<body>
+  <h1>🔧 Create Your Passwords</h1>
+  <p>Choose two passwords — one for you (owner) and one for Pfungwa (driver). You'll use these to log in.</p>
+
+  <label>Owner password</label>
+  <input id="owner" type="text" placeholder="1918">
+
+  <label>Driver password</label>
+  <input id="driver" type="text" placeholder="2026">
+
+  <button id="btn" onclick="runSetup()">Create Passwords</button>
+  <div id="out"></div>
+
+  <script>
+    async function runSetup() {
+      const owner = document.getElementById('owner').value;
+      const driver = document.getElementById('driver').value;
+      const btn = document.getElementById('btn');
+      const out = document.getElementById('out');
+
+      out.className = '';
+      out.style.display = 'none';
+      btn.disabled = true;
+      btn.textContent = 'Creating...';
+
+      try {
+        const r = await fetch('setup.php', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ owner, driver })
+        });
+        const j = await r.json();
+        if (j.ok) {
+          out.className = 'ok';
+          out.textContent = '✅ DONE!\n\nOwner password saved.\nDriver password saved.\n\nNow go to: polo.comsat.co.za\nLog in as Owner with the SAME password you just typed.';
+          btn.textContent = '✅ Passwords Created';
+        } else {
+          out.className = 'err';
+          out.textContent = '❌ Error: ' + (j.error || 'Unknown');
+          btn.disabled = false;
+          btn.textContent = 'Try Again';
+        }
+      } catch (e) {
+        out.className = 'err';
+        out.textContent = '❌ Network error: ' + e.message;
+        btn.disabled = false;
+        btn.textContent = 'Try Again';
+      }
+    }
+  </script>
+</body>
+</html>

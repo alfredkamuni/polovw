@@ -1,0 +1,20 @@
+# Sensitive config — NEVER commit
+config.php
+
+# Uploaded files (user data)
+uploads/*
+!uploads/.gitkeep
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+logs/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
